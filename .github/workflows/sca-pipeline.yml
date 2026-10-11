@@ -1,0 +1,31 @@
+name: DevSecOps Pipeline - Tahap 1 (SCA)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  software-composition-analysis:
+    name: SCA Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js (Backend Environment)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Run Dependency Scan (npm audit)
+        run: |
+          cd backend
+          # Menjalankan audit hanya jika package.json sudah dibuat di tahap selanjutnya
+          if [ -f "package.json" ]; then
+            npm install --package-lock-only
+            npm audit --audit-level=high
+          else
+            echo "Abaikan: package.json belum ada di folder backend."
+          fi
